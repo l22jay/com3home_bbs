@@ -40,7 +40,7 @@
             const token = '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';
 
             // base64로 인코딩된 내용
-            const encodedContent = btoa(inputData);
+            const encodedContent = btoa(unescape(encodeURIComponent(inputData)));
 
             const data = {
                 message: 'Add user input to file',
@@ -56,17 +56,23 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to save the content');
+                }
+            })
             .then(data => {
                 if (data.content) {
                     statusDiv.textContent = '입력이 성공적으로 저장되었습니다!';
                 } else {
-                    statusDiv.textContent = '오류가 발생했습니다.';
+                    statusDiv.textContent = '저장 실패: 데이터가 비어 있습니다.';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                statusDiv.textContent = '저장 중 오류가 발생했습니다.';
+                statusDiv.textContent = `저장 중 오류가 발생했습니다: ${error.message}`;
             });
         }
     </script>
