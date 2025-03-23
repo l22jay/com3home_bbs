@@ -30,10 +30,10 @@
                 content: btoa(`# ${title}\n\n${content}`)  // base64 인코딩
             };
 
-            fetch("posts/new-post.md", {
+            fetch("https://api.github.com/repos/l22jay/com3home_bbs/contents/posts/new-post.md", {
                 method: "PUT",
                 headers: {
-                    "Authorization": `token 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`,
+                    "Authorization": `token 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`,  // GitHub Personal Access Token
                     "Accept": "application/vnd.github.v3+json",
                 },
                 body: JSON.stringify({
@@ -41,7 +41,12 @@
                     content: postData.content,
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 alert("게시글이 성공적으로 저장되었습니다!");
                 document.getElementById('title').value = '';
@@ -49,6 +54,7 @@
             })
             .catch(error => {
                 console.error("Error:", error);
+                alert("게시글 저장에 실패했습니다.");
             });
         });
     </script>
