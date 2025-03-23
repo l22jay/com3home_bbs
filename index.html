@@ -4,64 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>게시글 작성</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        form { margin: 20px; }
-        textarea { width: 100%; height: 150px; }
-    </style>
 </head>
 <body>
     <h1>게시글 작성</h1>
     <form id="postForm">
         <label for="title">제목:</label>
         <input type="text" id="title" name="title" required><br><br>
-        
+
         <label for="content">내용:</label><br>
         <textarea id="content" name="content" required></textarea><br><br>
-        
+
         <button type="submit">등록</button>
     </form>
 
-    <h2>게시글 목록</h2>
-    <div id="posts"></div>
-
     <script>
-        // 게시글 데이터를 로컬 저장소에서 불러오기
-        function loadPosts() {
-            const posts = JSON.parse(localStorage.getItem('posts')) || [];
-            const postsContainer = document.getElementById('posts');
-            postsContainer.innerHTML = '';
-            
-            posts.forEach((post, index) => {
-                const postElement = document.createElement('div');
-                postElement.innerHTML = `
-                    <h3>${post.title}</h3>
-                    <p>${post.content}</p>
-                    <hr>
-                `;
-                postsContainer.appendChild(postElement);
-            });
-        }
-
-        // 게시글 추가 함수
         document.getElementById('postForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            
+
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
 
-            const posts = JSON.parse(localStorage.getItem('posts')) || [];
-            posts.push({ title, content });
-            localStorage.setItem('posts', JSON.stringify(posts));
+            // GitHub API를 통해 게시글을 리포지토리에 추가하기
+            const postData = {
+                message: `게시글 추가: ${title}`,
+                content: btoa(`# ${title}\n\n${content}`)  // base64 인코딩
+            };
 
-            document.getElementById('title').value = '';
-            document.getElementById('content').value = '';
-
-            loadPosts();
+            fetch("https://api.github.com/repos/your-username/my-posts-repo/contents/posts/new-post.md", {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token YOUR_PERSONAL_ACCESS_TOKEN`,
+                    "Accept": "application/vnd.github.v3+json",
+                },
+                body: JSON.stringify({
+                    message: postData.message,
+                    content: postData.content,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("게시글이 성공적으로 저장되었습니다!");
+                document.getElementById('title').value = '';
+                document.getElementById('content').value = '';
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
         });
-
-        // 페이지가 로드될 때 게시글 목록을 불러오기
-        window.onload = loadPosts;
     </script>
 </body>
 </html>
