@@ -3,63 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시글 작성</title>
+    <title>GitHub Pages에 사용자 입력 저장</title>
 </head>
 <body>
-    <h1>게시글 작성</h1>
-    <form id="postForm">
-        <label for="title">제목:</label>
-        <input type="text" id="title" name="title" required><br><br>
-
-        <label for="content">내용:</label><br>
-        <textarea id="content" name="content" required></textarea><br><br>
-
-        <button type="submit">등록</button>
+    <h1>GitHub Pages에 사용자 입력 저장</h1>
+    
+    <form id="inputForm">
+        <textarea id="userInput" placeholder="여기에 입력하세요..." rows="4" cols="50"></textarea><br><br>
+        <button type="submit">저장하기</button>
     </form>
 
+    <div id="status"></div>
+
     <script>
-        document.getElementById('postForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        const form = document.getElementById('inputForm');
+        const userInput = document.getElementById('userInput');
+        const statusDiv = document.getElementById('status');
 
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // 폼 제출 기본 동작 방지
 
-            // GitHub API를 통해 게시글을 리포지토리에 추가하기
-            const postData = {
-                message: `게시글 추가: ${title}`,
-                content: btoa(`# ${title}\n\n${content}`)  // base64 인코딩
+            const inputData = userInput.value;
+
+            if (inputData) {
+                saveInputToGitHub(inputData);
+            } else {
+                alert("입력된 내용이 없습니다.");
+            }
+        });
+
+        function saveInputToGitHub(inputData) {
+            // GitHub API URL
+            const apiUrl = 'https://api.github.com/repos/l22jay/com3home_bbs/contents/input.txt';
+
+            // Personal Access Token
+            const token = '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';
+
+            // base64로 인코딩된 내용
+            const encodedContent = btoa(inputData);
+
+            const data = {
+                message: 'Add user input to file',
+                content: encodedContent,
             };
 
-            fetch("https://api.github.com/repos/l22jay/com3home_bbs/contents/posts/new-post.md", {
-                method: "PUT",
+            fetch(apiUrl, {
+                method: 'PUT',
                 headers: {
-                    "Authorization": `token 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`,  // GitHub Personal Access Token
-                    "Accept": "application/vnd.github.v3+json",
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    message: postData.message,
-                    content: postData.content,
-                })
+                body: JSON.stringify(data)
             })
-            .then(response => {
-                console.log("응답 상태:", response.status);  // 응답 상태 코드 출력
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (data.error) {
-                    console.error("Error response:", data);  // 오류 응답 출력
-                    alert(`Error: ${data.message}`);
+                if (data.content) {
+                    statusDiv.textContent = '입력이 성공적으로 저장되었습니다!';
                 } else {
-                    alert("게시글이 성공적으로 저장되었습니다!");
-                    document.getElementById('title').value = '';
-                    document.getElementById('content').value = '';
+                    statusDiv.textContent = '오류가 발생했습니다.';
                 }
             })
             .catch(error => {
-                console.error("Error:", error);  // 네트워크 오류 출력
-                alert("게시글 저장에 실패했습니다.");
+                console.error('Error:', error);
+                statusDiv.textContent = '저장 중 오류가 발생했습니다.';
             });
-        });
+        }
     </script>
 </body>
 </html>
