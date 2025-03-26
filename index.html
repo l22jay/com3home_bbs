@@ -16,38 +16,42 @@
     <div id="post-list"></div>
 
     <script>
-        const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co"; // 🔹 Supabase 프로젝트 URL
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps"; // 🔹 API 키
+        // 🔹 Supabase 라이브러리가 로드된 후 createClient를 실행해야 함!
+        document.addEventListener("DOMContentLoaded", () => {
+            const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co"; // Supabase 프로젝트 URL
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps"; // API 키
+            
+            const { createClient } = supabase; // 🔹 구조 분해 할당으로 createClient 가져오기
+            const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY); // Supabase 클라이언트 생성
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        async function fetchPosts() {
-            const { data, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
-            if (error) { console.error("데이터 불러오기 실패", error); return; }
+            async function fetchPosts() {
+                const { data, error } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false });
+                if (error) { console.error("데이터 불러오기 실패", error); return; }
 
-            const postList = document.getElementById("post-list");
-            postList.innerHTML = "";
-            data.forEach(post => {
-                const postElement = document.createElement("div");
-                postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>`;
-                postList.appendChild(postElement);
+                const postList = document.getElementById("post-list");
+                postList.innerHTML = "";
+                data.forEach(post => {
+                    const postElement = document.createElement("div");
+                    postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>`;
+                    postList.appendChild(postElement);
+                });
+            }
+
+            document.getElementById("post-form").addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const title = document.getElementById("title").value;
+                const content = document.getElementById("content").value;
+
+                const { error } = await supabaseClient.from("posts").insert([{ title, content }]);
+                if (error) { console.error("게시 실패", error); return; }
+
+                document.getElementById("title").value = "";
+                document.getElementById("content").value = "";
+                fetchPosts();
             });
-        }
 
-        document.getElementById("post-form").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const title = document.getElementById("title").value;
-            const content = document.getElementById("content").value;
-
-            const { error } = await supabase.from("posts").insert([{ title, content }]);
-            if (error) { console.error("게시 실패", error); return; }
-
-            document.getElementById("title").value = "";
-            document.getElementById("content").value = "";
-            fetchPosts();
+            fetchPosts(); // 페이지 로딩 후 데이터 불러오기
         });
-
-        fetchPosts();
     </script>
 </body>
 </html>
