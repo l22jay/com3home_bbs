@@ -1,1 +1,53 @@
-안녕하세요
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 게시판</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+    <h1>📌 Supabase 게시판</h1>
+    <form id="post-form">
+        <input type="text" id="title" placeholder="제목" required>
+        <textarea id="content" placeholder="내용" required></textarea>
+        <button type="submit">게시하기</button>
+    </form>
+    <div id="post-list"></div>
+
+    <script>
+        const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co"; // 🔹 Supabase 프로젝트 URL
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps"; // 🔹 API 키
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        async function fetchPosts() {
+            const { data, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
+            if (error) { console.error("데이터 불러오기 실패", error); return; }
+
+            const postList = document.getElementById("post-list");
+            postList.innerHTML = "";
+            data.forEach(post => {
+                const postElement = document.createElement("div");
+                postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p>`;
+                postList.appendChild(postElement);
+            });
+        }
+
+        document.getElementById("post-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+
+            const { error } = await supabase.from("posts").insert([{ title, content }]);
+            if (error) { console.error("게시 실패", error); return; }
+
+            document.getElementById("title").value = "";
+            document.getElementById("content").value = "";
+            fetchPosts();
+        });
+
+        fetchPosts();
+    </script>
+</body>
+</html>
