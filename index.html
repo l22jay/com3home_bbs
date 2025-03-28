@@ -29,18 +29,20 @@
             const { createClient } = supabase; // ?? 구조 분해 할당으로 createClient 가져오기
             const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY); // Supabase 클라이언트 생성
 
+            // 게시글 목록을 불러오는 함수
             async function fetchPosts() {
                 const { data, error } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false });
                 if (error) { console.error("데이터 불러오기 실패", error); return; }
-
+        
                 const postList = document.getElementById("post-list");
                 postList.innerHTML = "";
                 data.forEach(post => {
                     const postElement = document.createElement("div");
-                    postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p><hr>`;
+                    postElement.innerHTML = `<h2><a href="post.html?id=${post.id}">${post.title}</a></h2><p>${post.content}</p><hr>`;
                     postList.appendChild(postElement);
                 });
             }
+
 
             document.getElementById("post-form").addEventListener("submit", async (event) => {
                 event.preventDefault();
