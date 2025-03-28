@@ -3,121 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supabase 게시판</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <style>
-        #post-container { display: none; }
-    </style>
+    <title>Supabase 데이터 가져오기</title>
 </head>
 <body>
-    <h1>📌 Supabase 게시판</h1>
 
-    <!-- ✏️ 게시글 작성 폼 -->
-    <form id="post-form">
-        <input type="text" id="title" placeholder="제목" required>
-        <textarea id="content" placeholder="내용" required></textarea>
-        <button type="submit">게시하기</button>
-    </form>
+    <h1>Supabase API 데이터</h1>
+    <button onclick="fetchData()">데이터 가져오기</button>
+    <ul id="data-list"></ul>
 
-    <!-- 📌 개별 게시글 보기 -->
-    <div id="post-container">
-        <h2 id="post-title"></h2>
-        <p id="post-content"></p>
-        <a href="/" onclick="goHome(event)">⬅️ 목록으로 돌아가기</a>
-    </div>
-
-    <!-- 📝 게시글 목록 -->
-    <div id="post-list"></div>
+    <!-- Supabase 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
     <script>
-        const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Supabase 클라이언트 초기화 (여기에 본인의 Supabase URL과 키를 입력)
+        const supabaseUrl = 'https://aypexxxatdakzzlgnbng.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // 📌 게시글 목록 불러오기
-        async function fetchPosts() {
-            const { data, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
+        // API 데이터 가져오기
+        async function fetchData() {
+            try {
+                // Supabase에서 데이터 가져오기
+                const { data, error } = await supabase
+                    .from('posts')  // 실제 테이블 이름으로 변경
+                    .select('id, title, content'); // 가져올 필드 지정
 
-            if (error) { console.error("데이터 불러오기 실패", error); return; }
+                if (error) {
+                    throw new Error(error.message);
+                }
 
-            const postList = document.getElementById("post-list");
-            postList.innerHTML = "";
+                // HTML 리스트에 데이터 표시
+                const dataList = document.getElementById('data-list');
+                dataList.innerHTML = ''; // 기존 내용 초기화
 
-            data.forEach(post => {
-                const postElement = document.createElement("div");
-                postElement.innerHTML = `
-                    <h2><a href="/${post.id}" onclick="navigateToPost(event, '${post.id}')">${post.title}</a></h2>
-                    <p>${post.content.substring(0, 100)}...</p>
-                `;
-                postList.appendChild(postElement);
-            });
-        }
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>ID:</strong> ${item.id} <br> <strong>Title:</strong> ${item.title} <br> <strong>Content:</strong> ${item.content}`;
+                    dataList.appendChild(li);
+                });
 
-        // ✏️ 게시글 작성
-        document.getElementById("post-form").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const title = document.getElementById("title").value;
-            const content = document.getElementById("content").value;
-
-            const { data, error } = await supabase.from("posts").insert([{ title, content }]);
-            if (error) { console.error("게시 실패", error); return; }
-
-            // 입력값 초기화 & 새 게시글 불러오기
-            document.getElementById("title").value = "";
-            document.getElementById("content").value = "";
-            fetchPosts();
-        });
-
-        // 🔹 게시글 개별 보기
-        async function fetchPost(postId) {
-            const { data, error } = await supabase.from("posts").select("*").eq("id", postId).single();
-
-            if (error || !data) {
-                document.getElementById("post-content").innerText = "게시글을 불러오는 데 실패했습니다.";
-                return;
+            } catch (error) {
+                console.error('데이터 가져오기 오류:', error);
             }
-
-            document.getElementById("post-title").innerText = data.title;
-            document.getElementById("post-content").innerHTML = data.content.replace(/\n/g, "<br>");
-
-            // UI 전환
-            document.getElementById("post-form").style.display = "none";
-            document.getElementById("post-list").style.display = "none";
-            document.getElementById("post-container").style.display = "block";
         }
-
-        // 🔹 `/id`로 이동 & 게시글 불러오기
-        function navigateToPost(event, postId) {
-            event.preventDefault();
-            history.pushState(null, "", `/${postId}`);
-            fetchPost(postId);
-        }
-
-        // ⬅️ 목록으로 돌아가기
-        function goHome(event) {
-            event.preventDefault();
-            history.pushState(null, "", "/");
-
-            document.getElementById("post-container").style.display = "none";
-            document.getElementById("post-form").style.display = "block";
-            document.getElementById("post-list").style.display = "block";
-
-            fetchPosts();
-        }
-
-        // ✅ URL에서 ID 감지해 게시글 불러오기
-        window.onload = function () {
-            const postId = window.location.pathname.substring(1);
-            if (postId) fetchPost(postId);
-            else fetchPosts();
-        };
-
-        // ⬅️ 뒤로 가기/앞으로 가기 지원
-        window.onpopstate = function () {
-            const postId = window.location.pathname.substring(1);
-            if (postId) fetchPost(postId);
-            else goHome(event);
-        };
     </script>
+
 </body>
 </html>
