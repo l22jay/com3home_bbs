@@ -7,7 +7,7 @@
 </head>
 <body>
 
-    <h1>Supabase API 데이터</h1>
+    <h1>Supabase API COM 데이터</h1>
     <button onclick="fetchData()">데이터 가져오기</button>
     <ul id="data-list"></ul>
 
@@ -18,11 +18,23 @@
         // Supabase 클라이언트 초기화 (여기에 본인의 Supabase URL과 키를 입력)
         const supabaseUrl = 'https://aypexxxatdakzzlgnbng.supabase.co'; // 실제 URL로 변경
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps'; // 본인의 공개 API 키로 변경
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // supabase 객체가 정상적으로 초기화된 후, fetchData 함수가 호출되어야 함
+        let supabase;
+
+        // 스크립트가 로드된 후 supabase 초기화
+        window.onload = function() {
+            supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        }
 
         // API 데이터 가져오기
         async function fetchData() {
             try {
+                // supabase가 초기화된 후 데이터 가져오기
+                if (!supabase) {
+                    throw new Error('Supabase가 초기화되지 않았습니다.');
+                }
+
                 // Supabase에서 데이터 가져오기
                 const { data, error } = await supabase
                     .from('posts')  // 실제 테이블 이름으로 변경
