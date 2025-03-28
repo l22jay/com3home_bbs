@@ -7,7 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body style="background-color: rgb(236, 242, 255);">
-    <h1>게시글 세부 정보</h1>
+    <h1><a href = "index.html">게시글 세부 정보</a></h1>
+    <hr>
     <div id="post-detail">
         <p>게시글을 불러오는 중...</p>
     </div>
@@ -32,7 +33,7 @@
             const { data, error } = await supabaseClient.from("posts").select("*").eq("id", postId).single();
 
             if (error) {
-                document.getElementById("post-detail").innerHTML = "게시글을 불러오는 데 실패했습니다.";
+                document.getElementById("post-detail").innerHTML = "게시글을 불러오지 못했습니다.\r\n게시글 ID를 확인해 보십시오.";
                 console.error("게시글 불러오기 실패", error);
                 return;
             }
