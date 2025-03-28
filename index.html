@@ -3,67 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COM3HOME 게시판</title>
+    <title>Supabase 게시판</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <style>
+        #post-container { display: none; }
+    </style>
 </head>
-<body style="background-color: rgb(236, 242, 255);">
-    <h1>COM3HOME 게시판</h1>
-    <h3>게시글 작성시 자신의 이름을 꼭 밝혀주세요. 좋은하루되세요~*</h3>
-    <hr>
-    <form id="post-form">
-        <input type="text" id="title" placeholder="제목" required>
-        <br>
-        <textarea id="content" placeholder="내용" required></textarea>
-        <br>
-        <button type="submit">게시하기</button>
-    </form>
-    <hr>
+<body>
+    <h1>📌 Supabase 게시판</h1>
+
+    <div id="post-container">
+        <h2 id="post-title"></h2>
+        <p id="post-content"></p>
+        <a href="/" onclick="goHome(event)">⬅️ 목록으로 돌아가기</a>
+    </div>
+
     <div id="post-list"></div>
 
     <script>
-        // 🔹 Supabase 라이브러리가 로드된 후 createClient를 실행해야 함!
-        document.addEventListener("DOMContentLoaded", () => {
-            const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co"; // Supabase 프로젝트 URL
-            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps"; // API 키
-            
-            const { createClient } = supabase; // 🔹 구조 분해 할당으로 createClient 가져오기
-            const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY); // Supabase 클라이언트 생성
+        const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            async function fetchPosts() {
-                const { data, error } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false });
-                if (error) { console.error("데이터 불러오기 실패", error); return; }
+        async function fetchPosts() {
+            const { data, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
 
-                const postList = document.getElementById("post-list");
-                postList.innerHTML = "";
-                data.forEach(post => {
-                    const postElement = document.createElement("div");
-                    postElement.innerHTML = `<h2>${post.title}</h2><p>${post.content}</p><hr>`;
-                    postList.appendChild(postElement);
-                });
+            if (error) { console.error("데이터 불러오기 실패", error); return; }
+
+            const postList = document.getElementById("post-list");
+            postList.innerHTML = "";
+
+            data.forEach(post => {
+                const postElement = document.createElement("div");
+                postElement.innerHTML = `
+                    <h2><a href="/${post.id}" onclick="navigateToPost(event, '${post.id}')">${post.title}</a></h2>
+                    <p>${post.content.substring(0, 100)}...</p>
+                `;
+                postList.appendChild(postElement);
+            });
+        }
+
+        async function fetchPost(postId) {
+            const { data, error } = await supabase.from("posts").select("*").eq("id", postId).single();
+
+            if (error || !data) {
+                document.getElementById("post-content").innerText = "게시글을 불러오는 데 실패했습니다.";
+                return;
             }
 
-            document.getElementById("post-form").addEventListener("submit", async (event) => {
-                event.preventDefault();
-                const title = document.getElementById("title").value;
-                const content = document.getElementById("content").value;
+            document.getElementById("post-title").innerText = data.title;
+            document.getElementById("post-content").innerHTML = data.content.replace(/\n/g, "<br>");
 
-                const { error } = await supabaseClient.from("posts").insert([{ title, content }]);
-                if (error) { console.error("게시 실패", error); return; }
+            // UI 전환
+            document.getElementById("post-list").style.display = "none";
+            document.getElementById("post-container").style.display = "block";
+        }
 
-                document.getElementById("title").value = "";
-                document.getElementById("content").value = "";
-                fetchPosts();
-            });
+        function navigateToPost(event, postId) {
+            event.preventDefault();
+            history.pushState(null, "", `/${postId}`);
+            fetchPost(postId);
+        }
 
-            fetchPosts(); // 페이지 로딩 후 데이터 불러오기
-        });
+        function goHome(event) {
+            event.preventDefault();
+            history.pushState(null, "", "/");
+            document.getElementById("post-container").style.display = "none";
+            document.getElementById("post-list").style.display = "block";
+            fetchPosts();
+        }
+
+        // URL에서 ID 감지해 게시글 로드
+        window.onload = function () {
+            const postId = window.location.pathname.substring(1);
+            if (postId) fetchPost(postId);
+            else fetchPosts();
+        };
+
+        // 뒤로가기/앞으로가기 이벤트 처리
+        window.onpopstate = function () {
+            const postId = window.location.pathname.substring(1);
+            if (postId) fetchPost(postId);
+            else goHome(event);
+        };
     </script>
 </body>
-
-<style>
-    #post-list p {
-        white-space: pre-line;
-    }
-</style>
-
 </html>
