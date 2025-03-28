@@ -42,7 +42,7 @@
             const postDetail = document.getElementById("post-detail");
             postDetail.innerHTML = `
                 <h1>${data.title}</h2>
-                <p>${data.content}</p>
+                <p style="white-space: pre-line;">${data.content}</p>
                 <hr>
                 <p><strong>작성일:</strong> ${new Date(data.created_at).toLocaleString()}</p>
             `;
