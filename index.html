@@ -16,8 +16,8 @@
 
     <script>
         // Supabase 클라이언트 초기화 (여기에 본인의 Supabase URL과 키를 입력)
-        const supabaseUrl = 'https://aypexxxatdakzzlgnbng.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps';
+        const supabaseUrl = 'https://aypexxxatdakzzlgnbng.supabase.co'; // 실제 URL로 변경
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps'; // 본인의 공개 API 키로 변경
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         // API 데이터 가져오기
@@ -36,11 +36,15 @@
                 const dataList = document.getElementById('data-list');
                 dataList.innerHTML = ''; // 기존 내용 초기화
 
-                data.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<strong>ID:</strong> ${item.id} <br> <strong>Title:</strong> ${item.title} <br> <strong>Content:</strong> ${item.content}`;
-                    dataList.appendChild(li);
-                });
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<strong>ID:</strong> ${item.id} <br> <strong>Title:</strong> ${item.title} <br> <strong>Content:</strong> ${item.content}`;
+                        dataList.appendChild(li);
+                    });
+                } else {
+                    dataList.innerHTML = '<li>데이터가 없습니다.</li>';
+                }
 
             } catch (error) {
                 console.error('데이터 가져오기 오류:', error);
