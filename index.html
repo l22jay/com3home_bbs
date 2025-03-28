@@ -12,12 +12,21 @@
 <body>
     <h1>📌 Supabase 게시판</h1>
 
+    <!-- ✏️ 게시글 작성 폼 -->
+    <form id="post-form">
+        <input type="text" id="title" placeholder="제목" required>
+        <textarea id="content" placeholder="내용" required></textarea>
+        <button type="submit">게시하기</button>
+    </form>
+
+    <!-- 📌 개별 게시글 보기 -->
     <div id="post-container">
         <h2 id="post-title"></h2>
         <p id="post-content"></p>
         <a href="/" onclick="goHome(event)">⬅️ 목록으로 돌아가기</a>
     </div>
 
+    <!-- 📝 게시글 목록 -->
     <div id="post-list"></div>
 
     <script>
@@ -25,6 +34,7 @@
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // 📌 게시글 목록 불러오기
         async function fetchPosts() {
             const { data, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
 
@@ -43,6 +53,22 @@
             });
         }
 
+        // ✏️ 게시글 작성
+        document.getElementById("post-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+
+            const { data, error } = await supabase.from("posts").insert([{ title, content }]);
+            if (error) { console.error("게시 실패", error); return; }
+
+            // 입력값 초기화 & 새 게시글 불러오기
+            document.getElementById("title").value = "";
+            document.getElementById("content").value = "";
+            fetchPosts();
+        });
+
+        // 🔹 게시글 개별 보기
         async function fetchPost(postId) {
             const { data, error } = await supabase.from("posts").select("*").eq("id", postId).single();
 
@@ -55,32 +81,38 @@
             document.getElementById("post-content").innerHTML = data.content.replace(/\n/g, "<br>");
 
             // UI 전환
+            document.getElementById("post-form").style.display = "none";
             document.getElementById("post-list").style.display = "none";
             document.getElementById("post-container").style.display = "block";
         }
 
+        // 🔹 `/id`로 이동 & 게시글 불러오기
         function navigateToPost(event, postId) {
             event.preventDefault();
             history.pushState(null, "", `/${postId}`);
             fetchPost(postId);
         }
 
+        // ⬅️ 목록으로 돌아가기
         function goHome(event) {
             event.preventDefault();
             history.pushState(null, "", "/");
+
             document.getElementById("post-container").style.display = "none";
+            document.getElementById("post-form").style.display = "block";
             document.getElementById("post-list").style.display = "block";
+
             fetchPosts();
         }
 
-        // URL에서 ID 감지해 게시글 로드
+        // ✅ URL에서 ID 감지해 게시글 불러오기
         window.onload = function () {
             const postId = window.location.pathname.substring(1);
             if (postId) fetchPost(postId);
             else fetchPosts();
         };
 
-        // 뒤로가기/앞으로가기 이벤트 처리
+        // ⬅️ 뒤로 가기/앞으로 가기 지원
         window.onpopstate = function () {
             const postId = window.location.pathname.substring(1);
             if (postId) fetchPost(postId);
