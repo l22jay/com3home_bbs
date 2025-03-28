@@ -7,7 +7,7 @@
 </head>
 <body>
 
-    <h1>Supabase API COM 데이터</h1>
+    <h1>Supabase API 3 데이터</h1>
     <button onclick="fetchData()">데이터 가져오기</button>
     <ul id="data-list"></ul>
 
@@ -22,7 +22,7 @@
         // supabase 객체가 정상적으로 초기화된 후, fetchData 함수가 호출되어야 함
         let supabase;
 
-        // 스크립트가 로드된 후 supabase 초기화
+        // 페이지가 로드될 때 supabase 초기화
         window.onload = function() {
             supabase = supabase.createClient(supabaseUrl, supabaseKey);
         }
