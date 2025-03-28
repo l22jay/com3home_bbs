@@ -2,7 +2,12 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url=https://bbs.com3home.kro.kr">
+    <script type="text/javascript">
+        // 페이지 로드 후 리디렉션을 한 번만 실행
+        if (window.location.href !== "https://bbs.com3home.kro.kr") {
+            window.location.href = "https://bbs.com3home.kro.kr";
+        }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COM3HOME 게시판</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
