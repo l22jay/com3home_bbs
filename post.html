@@ -33,7 +33,7 @@
             const { data, error } = await supabaseClient.from("posts").select("*").eq("id", postId).single();
 
             if (error) {
-                document.getElementById("post-detail").innerHTML = "<p>게시글을 불러오지 못했습니다.\n게시글 ID를 확인해 보십시오.</p>";
+                document.getElementById("post-detail").innerHTML = "<p>게시글을 불러오지 못했습니다.\r\n게시글 ID를 확인해 보십시오.</p>";
                 console.error("게시글 불러오기 실패", error);
                 return;
             }
