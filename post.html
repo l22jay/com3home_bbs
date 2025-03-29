@@ -39,10 +39,27 @@
                 return;
             }
 
+                // HTML 엔티티로 변환하는 함수
+                function escapeHTML(str) {
+                    return str.replace(/[&<>"']/g, function (match) {
+                        return {
+                            '&': '&amp;',
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            '"': '&quot;',
+                            "'": '&#39;'
+                        }[match];
+                    });
+                }
+
+                const escapedTitle = escapeHTML(post.title);
+                const escapedAuthor = escapeHTML(post.author);
+            
             // 게시글 세부 정보 표시
             const postDetail = document.getElementById("post-detail");
             postDetail.innerHTML = `
-                <h1>${data.title}</h2>
+                <h1 style="display:inline">${escapedTitle}</h1>
+                <p style="display:inline"> -${escapedAuthor}</p>
                 <p style="white-space: pre-line;">${data.content}</p>
                 <hr>
                 <p><strong>작성일:</strong> ${new Date(data.created_at).toLocaleString()}</p>
