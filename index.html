@@ -48,7 +48,24 @@
                 postList.innerHTML = "";
                 data.forEach(post => {
                     const postElement = document.createElement("div");
-                    postElement.innerHTML = `<h2 style="display:inline"><a href="post?id=${post.id}">${post.title}</a></h2><p style="display:inline"> -${post.author}</p><br><p>${post.content}</p><hr>`;
+
+                    // HTML 엔티티로 변환하는 함수
+                    function escapeHTML(str) {
+                        return str.replace(/[&<>"']/g, function (match) {
+                            return {
+                                '&': '&amp;',
+                                '<': '&lt;',
+                                '>': '&gt;',
+                                '"': '&quot;',
+                                "'": '&#39;'
+                            }[match];
+                        });
+                    }
+
+                    const escapedTitle = escapeHTML(post.title);
+                    const escapedAuthor = escapeHTML(post.author);
+    
+                    postElement.innerHTML = `<p style="display:inline"><a href="post?id=${post.id}">${escapedTitle}</a></p><p style="display:inline"> -${escapedAuthor}</p><hr>`;
                     postList.appendChild(postElement);
                 });
             }
