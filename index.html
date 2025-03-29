@@ -15,8 +15,6 @@
         <br>
         <textarea id="content" placeholder="내용" required></textarea>
         <br>
-        <input type="password" id="password" placeholder="비밀번호" required>
-        <br>
         <button type="submit">게시하기</button>
     </form>
     <hr>
@@ -46,44 +44,21 @@
             }
 
 
-            async function hashPassword(password) {
-                const encoder = new TextEncoder();
-                const data = encoder.encode(password);
-                const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-                return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
-            }
-            
             document.getElementById("post-form").addEventListener("submit", async (event) => {
                 event.preventDefault();
                 const title = document.getElementById("title").value;
                 const content = document.getElementById("content").value;
-                const password = document.getElementById("password").value;
-            
-                if (!password) {
-                    alert("비밀번호를 입력해주세요!");
-                    return;
-                }
-            
-                const passwordHash = await hashPassword(password);
-            
-                const { error } = await supabase.from("posts").insert([{ title, content, password_hash: passwordHash }]);
-                if (error) {
-                    console.error("게시 실패", error);
-                    return;
-                }
-            
+
+                const { error } = await supabaseClient.from("posts").insert([{ title, content }]);
+                if (error) { console.error("게시 실패", error); return; }
+
                 document.getElementById("title").value = "";
                 document.getElementById("content").value = "";
-                document.getElementById("password").value = "";
                 fetchPosts();
             });
 
             fetchPosts(); // 페이지 로딩 후 데이터 불러오기
         });
-
-
-
-        
     </script>
 
 <style>
