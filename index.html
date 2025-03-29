@@ -38,7 +38,7 @@
                 postList.innerHTML = "";
                 data.forEach(post => {
                     const postElement = document.createElement("div");
-                    postElement.innerHTML = `<h2><a href="post?id=${post.id}">${post.title}</a></h2>${post.content}<hr>`;
+                    postElement.innerHTML = `<h2><a href="post?id=${post.id}">${post.title}</a></h2><p>${post.content}</p><hr>`;
                     postList.appendChild(postElement);
                 });
             }
