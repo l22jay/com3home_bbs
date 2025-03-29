@@ -13,6 +13,8 @@
     <form id="post-form">
         <input type="text" id="title" placeholder="제목" required>
         <br>
+        <input type="text" id="author" placeholder="작성자 이름" required>
+        <br>
         <textarea id="content" placeholder="내용" required></textarea>
         <br>
         <button type="submit">게시하기</button>
@@ -38,7 +40,7 @@
                 postList.innerHTML = "";
                 data.forEach(post => {
                     const postElement = document.createElement("div");
-                    postElement.innerHTML = `<h2><a href="post?id=${post.id}">${post.title}</a></h2><p>${post.content}</p><hr>`;
+                    postElement.innerHTML = `<h2><a href="post?id=${post.id}">${post.title}</a></h2><p>-${post.author}</p><p>${post.content}</p><hr>`;
                     postList.appendChild(postElement);
                 });
             }
@@ -53,6 +55,7 @@
                 if (error) { console.error("게시 실패", error); return; }
 
                 document.getElementById("title").value = "";
+                document.getElementById("author").value = "";
                 document.getElementById("content").value = "";
                 fetchPosts();
             });
