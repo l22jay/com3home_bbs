@@ -53,8 +53,9 @@
                 event.preventDefault();
                 const title = document.getElementById("title").value;
                 const content = document.getElementById("content").value;
+                const author = document.getElementById("author").value;
 
-                const { error } = await supabaseClient.from("posts").insert([{ title, content }]);
+                const { error } = await supabaseClient.from("posts").insert([{ title, content, author }]);
                 if (error) { console.error("게시 실패", error); return; }
 
                 document.getElementById("title").value = "";
