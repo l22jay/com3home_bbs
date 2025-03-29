@@ -3,6 +3,10 @@
     src: url("fonts/hbios-sys.woff2") format("woff2"),
 }
 
+body {
+    font-family: "HBIOS-SYS", sans-serif;
+}
+
 #message {
     color: red;
     font-size: 12px;
