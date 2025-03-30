@@ -35,7 +35,8 @@
 
             if (error) {
                 document.getElementById("post-detail").innerHTML = "<p>게시글을 불러오지 못했습니다.<br>게시글 ID를 확인해 보십시오.</p>";
-                console.error("게시글 불러오기 실패", error);
+                //console.error("게시글 불러오기 실패", error);
+                alert("게시글 데이터를 불러오지 못했습니다.");
                 return;
             }
 
