@@ -44,7 +44,7 @@
             // 게시글 목록을 불러오는 함수
             async function fetchPosts() {
                 const { data, error } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false });
-                if (error) { alert("데이터 불러오기 실패" + error); return; }
+                if (error) { alert("게시글 데이터를 불러오지 못했습니다."); return; }
         
                 const postList = document.getElementById("post-list");
                 postList.innerHTML = "";
@@ -80,7 +80,7 @@
                 const author = document.getElementById("author").value;
 
                 const { error } = await supabaseClient.from("posts").insert([{ title, content, author }]);
-                if (error) { alert("게시 실패" + error); return; }
+                if (error) { alert("게시하지 못했습니다."); return; }
 
                 document.getElementById("title").value = "";
                 document.getElementById("author").value = "";
