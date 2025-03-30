@@ -65,16 +65,15 @@
                 <hr>
                 <p><strong>작성일:</strong> ${new Date(data.created_at).toLocaleString()}</p>
             `;
-            <script>
-                document.getElementById("copyBtn").addEventListener("click", function() {
-                    const currentUrl = window.location.href;
-                    navigator.clipboard.writeText(currentUrl).then(function() {
-                        alert("URL이 클립보드에 복사되었습니다.");
-                    }).catch(function(error) {
-                        alert("URL 복사에 실패했습니다: " + error);
-                    });
+
+            document.getElementById("copyBtn").addEventListener("click", function() {
+                const currentUrl = window.location.href;
+                navigator.clipboard.writeText(currentUrl).then(function() {
+                    alert("URL이 클립보드에 복사되었습니다.");
+                }).catch(function(error) {
+                    alert("URL 복사에 실패했습니다: " + error);
                 });
-            </script>
+            });
             
         });
     </script>
