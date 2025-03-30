@@ -60,6 +60,17 @@
             postDetail.innerHTML = `
                 <h1 style="display:inline">${escapedTitle}</h1>
                 <p style="display:inline"> -${escapedAuthor}</p>
+                    <button id="copyBtn">현재 URL 복사</button>
+                <script>
+                    document.getElementById("copyBtn").addEventListener("click", function() {
+                        const currentUrl = window.location.href;
+                        navigator.clipboard.writeText(currentUrl).then(function() {
+                            alert("URL이 클립보드에 복사되었습니다.");
+                        }).catch(function(error) {
+                            alert("URL 복사에 실패했습니다: " + error);
+                        });
+                    });
+                </script>
                 <p style="white-space: pre-line;">${data.content}</p>
                 <hr>
                 <p><strong>작성일:</strong> ${new Date(data.created_at).toLocaleString()}</p>
