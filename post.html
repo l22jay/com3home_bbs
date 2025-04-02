@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COM3HOME - 게시글 보기</title>
+    <title>COM3HOME 게시판 - 게시글 보기</title>
     <link rel="stylesheet" href="XP.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
@@ -55,11 +55,12 @@
 
                 const escapedTitle = escapeHTML(data.title);
                 const escapedAuthor = escapeHTML(data.author);
+
+            document.title = `COM3HOME 게시판 - ${escapedTitle}`;
             
             // 게시글 세부 정보 표시
             const postDetail = document.getElementById("post-detail");
             postDetail.innerHTML = `
-                <title>COM3HOME - ${escapedTitle}</title>
                 <h1 style="display:inline">${escapedTitle}</h1>
                 <p style="display:inline"> -${escapedAuthor}</p>
                     <button id="copyBtn">게시글 URL 복사</button>
