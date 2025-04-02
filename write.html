@@ -29,37 +29,42 @@
     </form>
 
     <script>
-        const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzIiwi...";
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+        // ?? Supabase 라이브러리가 로드된 후 createClient를 실행해야 함!
+        document.addEventListener("DOMContentLoaded", () => {
+            const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co"; // Supabase 프로젝트 URL
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps"; // API 키
+            
+            const { createClient } = supabase; // ?? 구조 분해 할당으로 createClient 가져오기
+            const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY); // Supabase 클라이언트 생성
 
-        async function loadPost() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const postId = urlParams.get("id");
-
-            if (!postId) {
-                document.body.innerHTML = "<h1>잘못된 접근입니다.</h1>";
-                return;
-            }
-
+        document.getElementById("post-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+            const author = document.getElementById("author").value;
+        
             const { data, error } = await supabaseClient
                 .from("posts")
-                .select("*")
-                .eq("id", postId)
-                .single();
-
-            if (error || !data) {
-                document.body.innerHTML = "<h1>게시글을 찾을 수 없습니다.</h1>";
+                .insert([{ title, content, author }])
+                .select("*"); // ID를 포함한 전체 데이터 반환
+        
+            if (error) {
+                alert("게시하지 못했습니다.");
                 return;
             }
 
-            document.getElementById("post-title").innerText = data.title;
-            document.getElementById("post-author").innerText = data.author;
-            document.getElementById("post-content").innerText = data.content;
-        }
+            if (data.length > 0) {
+                const postId = data[0].id; // 게시글 ID 가져오기
+                window.location.href = `post.html?id=${postId}`; // 게시글 페이지로 이동
+            }
+                document.getElementById("title").value = "";
+                document.getElementById("author").value = "";
+                document.getElementById("content").value = "";
+                fetchPosts();
+            });
 
-        document.addEventListener("DOMContentLoaded", loadPost);
+            fetchPosts(); // 페이지 로딩 후 데이터 불러오기
+        });
     </script>
 
 <style>
