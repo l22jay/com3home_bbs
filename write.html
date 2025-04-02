@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COM3HOME 게시판</title>
+    <title>COM3HOME 게시판 - 게시글 작성</title>
     <link rel="stylesheet" href="XP.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <!--body style="background-color: rgb(236, 242, 255);"-->
 <body class="surface">
-    <h1>COM3HOME 게시판</h1>
-    <h3>COM3HOME</h3>
+    <h1>COM3HOME 게시판 - 게시글 작성</h1>
+    <!--h3>COM3HOME</h3-->
     <hr>
     <form id="post-form">
         <p style="display:inline">제&nbsp;&nbsp;목: </p>
@@ -26,11 +26,7 @@
         <br>
         <br>
         <button type="submit">게시하기</button>
-        <hr>
-        <h2>게시글 목록</h2>
     </form>
-    <hr>
-    <div id="post-list"></div>
 
     <script>
         // ?? Supabase 라이브러리가 로드된 후 createClient를 실행해야 함!
@@ -40,38 +36,6 @@
             
             const { createClient } = supabase; // ?? 구조 분해 할당으로 createClient 가져오기
             const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY); // Supabase 클라이언트 생성
-
-            // 게시글 목록을 불러오는 함수
-            async function fetchPosts() {
-                const { data, error } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false });
-                if (error) { alert("게시글 데이터를 불러오지 못했습니다."); return; }
-        
-                const postList = document.getElementById("post-list");
-                postList.innerHTML = "";
-                data.forEach(post => {
-                    const postElement = document.createElement("div");
-
-                    // HTML 엔티티로 변환하는 함수
-                    function escapeHTML(str) {
-                        return str.replace(/[&<>"']/g, function (match) {
-                            return {
-                                '&': '&amp;',
-                                '<': '&lt;',
-                                '>': '&gt;',
-                                '"': '&quot;',
-                                "'": '&#39;'
-                            }[match];
-                        });
-                    }
-
-                    const escapedTitle = escapeHTML(post.title);
-                    const escapedAuthor = escapeHTML(post.author);
-    
-                    postElement.innerHTML = `<p style="display:inline"><a href="post?id=${post.id}">${escapedTitle}</a></p><p style="display:inline"> -${escapedAuthor}</p><p style="display:inline"><strong> 작성일:</strong> ${new Date(post.created_at).toLocaleString()}</p><hr>`;
-                    postList.appendChild(postElement);
-                });
-            }
-
 
             document.getElementById("post-form").addEventListener("submit", async (event) => {
                 event.preventDefault();
