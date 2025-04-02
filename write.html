@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COM3HOME 게시판</title>
+    <link rel="stylesheet" href="XP.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<!--body style="background-color: rgb(236, 242, 255);"-->
+<body class="surface">
+    <h1>COM3HOME 게시판</h1>
+    <h3>COM3HOME</h3>
+    <hr>
+    <form id="post-form">
+        <p style="display:inline">제&nbsp;&nbsp;목: </p>
+        <input size=100 type="text" id="title" placeholder="게시글 제목을 입력하십시오." title="게시글 제목을 입력하십시오." required>
+        <br>
+        <br>
+        <p style="display: inline">작성자: </p>
+        <input size=100 type="text" id="author" placeholder="게시글 작성자 이름을 입력하십시오." title="게시글 작성자 이름을 입력하십시오." required>
+        <br>
+        <br>
+        <p style="display: inline;vertical-align: top">내&nbsp;&nbsp;용: </p>
+        <textarea id="content" placeholder="게시글 내용을 입력하십시오.&#13;&#10;게시글 내용에 HTML을 적용할 수 있습니다.&#13;&#10;게시 후에는 수정 및 삭제가 불가합니다." title="게시글 내용을 입력하십시오." required="" cols="100" rows="25"></textarea>
+        <br>
+        <br>
+        <button type="submit">게시하기</button>
+        <hr>
+        <h2>게시글 목록</h2>
+    </form>
+    <hr>
+    <div id="post-list"></div>
+
+    <script>
+        // ?? Supabase 라이브러리가 로드된 후 createClient를 실행해야 함!
+        document.addEventListener("DOMContentLoaded", () => {
+            const SUPABASE_URL = "https://aypexxxatdakzzlgnbng.supabase.co"; // Supabase 프로젝트 URL
+            const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5cGV4eHhhdGRha3p6bGduYm5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTI3NTEsImV4cCI6MjA1ODM4ODc1MX0.0wEZm3sOESn_5W_6wjCQA1UuQT66pRUpLpJJIl5dHps"; // API 키
+            
+            const { createClient } = supabase; // ?? 구조 분해 할당으로 createClient 가져오기
+            const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY); // Supabase 클라이언트 생성
+
+            // 게시글 목록을 불러오는 함수
+            async function fetchPosts() {
+                const { data, error } = await supabaseClient.from("posts").select("*").order("created_at", { ascending: false });
+                if (error) { alert("게시글 데이터를 불러오지 못했습니다."); return; }
+        
+                const postList = document.getElementById("post-list");
+                postList.innerHTML = "";
+                data.forEach(post => {
+                    const postElement = document.createElement("div");
+
+                    // HTML 엔티티로 변환하는 함수
+                    function escapeHTML(str) {
+                        return str.replace(/[&<>"']/g, function (match) {
+                            return {
+                                '&': '&amp;',
+                                '<': '&lt;',
+                                '>': '&gt;',
+                                '"': '&quot;',
+                                "'": '&#39;'
+                            }[match];
+                        });
+                    }
+
+                    const escapedTitle = escapeHTML(post.title);
+                    const escapedAuthor = escapeHTML(post.author);
+    
+                    postElement.innerHTML = `<p style="display:inline"><a href="post?id=${post.id}">${escapedTitle}</a></p><p style="display:inline"> -${escapedAuthor}</p><p style="display:inline"><strong> 작성일:</strong> ${new Date(post.created_at).toLocaleString()}</p><hr>`;
+                    postList.appendChild(postElement);
+                });
+            }
+
+
+            document.getElementById("post-form").addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const title = document.getElementById("title").value;
+                const content = document.getElementById("content").value;
+                const author = document.getElementById("author").value;
+
+                const { error } = await supabaseClient.from("posts").insert([{ title, content, author }]);
+                if (error) { alert("게시하지 못했습니다."); return; }
+
+                document.getElementById("title").value = "";
+                document.getElementById("author").value = "";
+                document.getElementById("content").value = "";
+                fetchPosts();
+            });
+
+            fetchPosts(); // 페이지 로딩 후 데이터 불러오기
+        });
+    </script>
+
+<style>
+    @font-face {
+        font-family: "GulimChe";
+        src: url("fonts/GulimChe.woff") format("woff");
+    }
+    
+    * {
+        font-family: "GulimChe", sans-serif !important;
+    }
+    
+    #post-list p {
+        white-space: pre-line;
+    }
+    
+</style>
+    
+</body>
+
+</html>
