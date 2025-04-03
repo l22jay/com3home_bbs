@@ -69,7 +69,7 @@
                     const escapedTitle = escapeHTML(post.title);
                     const escapedAuthor = escapeHTML(post.author);
     
-                    postElement.innerHTML = `<p style="display:inline"><a href="post?id=${post.id}">${escapedTitle}</a></p><p style="display:inline"> -${escapedAuthor}</p><p style="display:inline"><strong> 작성일:</strong> ${new Date(post.created_at).toLocaleString()}</p><hr>`;
+                    postElement.innerHTML = `<p style="display:inline"><a href="/post?id=${post.id}">${escapedTitle}</a></p><p style="display:inline"> -${escapedAuthor}</p><p style="display:inline"><strong> 작성일:</strong> ${new Date(post.created_at).toLocaleString()}</p><hr>`;
                     postList.appendChild(postElement);
                 });
             }
